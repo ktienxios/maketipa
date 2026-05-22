@@ -1,4 +1,3 @@
-
 #import "InfoViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
@@ -14,20 +13,19 @@
     if (!self) return nil;
     self.backgroundColor = [UIColor clearColor];
 
-    // Nhãn bên trái: Chữ màu trắng, tăng độ dày một chút để dễ đọc
+    // Nhãn bên trái: Chữ màu trắng nguyên bản
     _leftLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _leftLabel.text = left ?: @"";
     _leftLabel.font = [UIFont systemFontOfSize:15 weight:UIFontWeightMedium];
     _leftLabel.textColor = [UIColor whiteColor];
     [self addSubview:_leftLabel];
 
-    // Nhãn bên phải: Chữ màu hồng nhạt, mang hơi hướng công nghệ
+    // SỬA: Thay thế màu hồng nhạt cũ thành màu trắng mờ (Xám nhạt) tinh tế
     _rightLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _rightLabel.text = right ?: @"—";
     _rightLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightRegular];
-    _rightLabel.textColor = [UIColor colorWithRed:1.00 green:0.75 blue:0.85 alpha:0.9];
+    _rightLabel.textColor = [UIColor colorWithWhite:1.0 alpha:0.75];
     _rightLabel.textAlignment = NSTextAlignmentRight;
-    // Tự động thu nhỏ font nếu text quá dài (như Bundle Identifier) để không bị cắt chữ
     _rightLabel.adjustsFontSizeToFitWidth = YES;
     _rightLabel.minimumScaleFactor = 0.75;
     [self addSubview:_rightLabel];
@@ -35,11 +33,11 @@
 }
 
 - (void)layoutSubviews {
+    [super copy]; // Đảm bảo cấu trúc hiển thị
     [super layoutSubviews];
     CGFloat w = self.bounds.size.width;
     CGFloat h = self.bounds.size.height;
     
-    // Chia tỷ lệ 40% - 60% giúp hiển thị các chuỗi dài bên phải tốt hơn
     _leftLabel.frame = CGRectMake(18, 0, w * 0.40f - 18, h);
     _rightLabel.frame = CGRectMake(w * 0.40f, 0, w * 0.60f - 18, h);
 }
@@ -57,32 +55,31 @@
 
 @implementation InfoViewController
 
-#pragma mark - Theme Đồng Bộ (Cyber Sakura)
+#pragma mark - Theme Đồng Bộ (Monochrome)
 
-- (UIColor *)accent { return [UIColor colorWithRed:1.00 green:0.41 blue:0.71 alpha:1]; } // Hồng anh đào rực
+// SỬA: Đổi màu Accent chủ đạo từ Hồng sang Trắng hoàn toàn để đồng bộ Home Panel
+- (UIColor *)accent { return [UIColor whiteColor]; }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // 1. Nền tối Gradient Midnight Purple sâu thẳm giống Home Panel
+    // 1. SỬA: Đổi nền Gradient Midnight Purple thành màu đen thuần giống hệt HomeViewController
     CAGradientLayer *bg = [CAGradientLayer layer];
     bg.frame = self.view.bounds;
     bg.colors = @[
-        (__bridge id)[UIColor colorWithRed:0.04 green:0.03 blue:0.09 alpha:1].CGColor,
-        (__bridge id)[UIColor colorWithRed:0.12 green:0.06 blue:0.22 alpha:1].CGColor,
-        (__bridge id)[UIColor colorWithRed:0.20 green:0.07 blue:0.30 alpha:1].CGColor
+        (__bridge id)[UIColor blackColor].CGColor,
+        (__bridge id)[UIColor blackColor].CGColor
     ];
-    bg.locations = @[@0.0, @0.5, @1.0];
     [self.view.layer insertSublayer:bg atIndex:0];
 
-    // 2. Tiêu đề chính phát sáng Neon cực chất
+    // 2. Tiêu đề chính phát sáng tinh tế
     _titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _titleLabel.text = @"BUILD INFO";
     _titleLabel.font = [UIFont systemFontOfSize:38 weight:UIFontWeightBlack];
     _titleLabel.textColor = [UIColor whiteColor];
-    _titleLabel.layer.shadowColor = [self accent].CGColor;
-    _titleLabel.layer.shadowRadius = 15;
-    _titleLabel.layer.shadowOpacity = 0.75;
+    _titleLabel.layer.shadowColor = [UIColor whiteColor].CGColor;
+    _titleLabel.layer.shadowRadius = 16;
+    _titleLabel.layer.shadowOpacity = 0.15; // Hạ shadow mờ ảo dịu mắt giống Home Panel
     _titleLabel.layer.shadowOffset = CGSizeZero;
     [self.view addSubview:_titleLabel];
 
@@ -90,33 +87,34 @@
     _subTitleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _subTitleLabel.text = @"APPLICATION METADATA & SPECS";
     _subTitleLabel.font = [UIFont systemFontOfSize:11 weight:UIFontWeightBold];
-    _subTitleLabel.textColor = [self accent];
-    _subTitleLabel.alpha = 0.85;
+    _subTitleLabel.textColor = [UIColor colorWithWhite:1 alpha:0.55]; // Thay thế màu hồng bằng màu xám mờ
     [self.view addSubview:_subTitleLabel];
 
-    // 3. Khung Card chứa thông tin kiểu Kính Mờ (Glassmorphism)
+    // 3. Khung Card chứa thông tin kiểu Kính Mờ (Glassmorphism) tối giản
     _cardView = [[UIView alloc] initWithFrame:CGRectZero];
     _cardView.layer.cornerRadius = 24;
     _cardView.clipsToBounds = YES;
     
-    // Viền hồng Neon mỏng tinh tế
-    _cardView.layer.borderWidth = 0.8;
-    _cardView.layer.borderColor = [[self accent] colorWithAlphaComponent:0.25].CGColor;
+    // SỬA: Viền kính trắng mờ mỏng tinh tế thay cho viền hồng cũ
+    _cardView.layer.borderWidth = 1.2;
+    _cardView.layer.borderColor = [[UIColor whiteColor] colorWithAlphaComponent:0.08].CGColor;
     
-    // Đổ bóng lan tỏa nhẹ sau lưng Card
-    _cardView.layer.shadowColor = [self accent].CGColor;
-    _cardView.layer.shadowOpacity = 0.20;
+    // SỬA: Đổ bóng xám nhẹ nhàng sau lưng Card
+    _cardView.layer.shadowColor = [UIColor blackColor].CGColor;
+    _cardView.layer.shadowOpacity = 0.3;
     _cardView.layer.shadowRadius = 20;
     _cardView.layer.shadowOffset = CGSizeZero;
     [self.view addSubview:_cardView];
 
-    // Lớp phủ Gradient mờ mịn phía trong Card
+    // SỬA: Lớp phủ Gradient xám/đen mờ mịn phía trong Card đồng bộ với Card bên Home Panel
     _cardGradient = [CAGradientLayer layer];
     _cardGradient.colors = @[
-        (__bridge id)[UIColor colorWithWhite:1.0 alpha:0.07].CGColor,
-        (__bridge id)[UIColor colorWithWhite:1.0 alpha:0.02].CGColor,
-        (__bridge id)[UIColor colorWithRed:1.00 green:0.41 blue:0.71 alpha:0.03].CGColor
+        (__bridge id)[UIColor colorWithWhite:0.12 alpha:1.0].CGColor,
+        (__bridge id)[UIColor colorWithWhite:0.10 alpha:1.0].CGColor,
+        (__bridge id)[UIColor colorWithWhite:0.08 alpha:1.0].CGColor
     ];
+    _cardGradient.startPoint = CGPointMake(0, 0);
+    _cardGradient.endPoint = CGPointMake(1, 1);
     [_cardView.layer insertSublayer:_cardGradient atIndex:0];
 
     // Hiệu ứng Blur nền hệ thống (Material Dark)
@@ -148,8 +146,8 @@
         [_cardView addSubview:_rows[i]];
         if (i != _rows.count - 1) {
             UIView *sep = [[UIView alloc] initWithFrame:CGRectZero];
-            // Thanh chia mỏng màu hồng neon cực nhạt, trong suốt cao
-            sep.backgroundColor = [[self accent] colorWithAlphaComponent:0.12];
+            // SỬA: Thanh chia mỏng màu xám mờ đồng bộ (tag=999 giống bên Home)
+            sep.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.08];
             sep.tag = 9000 + (int)i;
             [_cardView addSubview:sep];
         }
@@ -162,14 +160,14 @@
     CGFloat w = self.view.bounds.size.width;
 
     // Định vị Tiêu đề giống hệt bên HomeViewController
-    _titleLabel.frame = CGRectMake(24, insets.top + 24, w - 48, 44);
+    _titleLabel.frame = CGRectMake(24, insets.top + 18, w - 48, 48);
     _subTitleLabel.frame = CGRectMake(26, CGRectGetMaxY(_titleLabel.frame) + 2, w - 52, 18);
 
     // Định vị Card thông tin
-    CGFloat cardX = 16;
-    CGFloat cardW = w - 32;
-    CGFloat cardY = CGRectGetMaxY(_subTitleLabel.frame) + 24;
-    CGFloat rowH = 52; // Tăng chiều cao mỗi hàng lên 52 để nhìn thoáng và sang trọng hơn
+    CGFloat cardX = 18;
+    CGFloat cardW = w - 36;
+    CGFloat cardY = CGRectGetMaxY(_subTitleLabel.frame) + 20;
+    CGFloat rowH = 52; 
     CGFloat cardH = rowH * _rows.count;
     _cardView.frame = CGRectMake(cardX, cardY, cardW, cardH);
 
@@ -184,8 +182,7 @@
         
         UIView *sep = [_cardView viewWithTag:9000 + (int)i];
         if (sep) {
-            // Thanh chia nằm ở sát mép dưới hàng, thụt lề 16px hai bên
-            sep.frame = CGRectMake(16, CGRectGetMaxY(rv.frame) - 0.5f, cardW - 32, 0.5f);
+            sep.frame = CGRectMake(20, CGRectGetMaxY(rv.frame) - 0.5f, cardW - 40, 0.5f);
         }
     }
 }
