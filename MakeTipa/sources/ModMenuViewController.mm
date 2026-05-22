@@ -36,9 +36,7 @@ static const CGFloat kTabStartY       = 22.0f;
 #define kColorDanger     [UIColor colorWithRed:0.937f green:0.267f blue:0.267f alpha:1.0f]
 #define kColorDangerSurf [UIColor colorWithRed:0.220f green:0.102f blue:0.102f alpha:1.0f]
 
-// Legacy accent RGB — updated to match Neon Red/Orange
 static const CGFloat kAccentR = 1.000f, kAccentG = 0.302f, kAccentB = 0.165f;
-
 static const NSInteger kSegmentTrackTag = 9101;
 static const NSInteger kSegmentLabelTag = 9201;
 
@@ -46,39 +44,6 @@ typedef NS_ENUM(NSInteger, MenuTab) {
     MenuTabESP    = 0,
     MenuTabAimbot = 1
 };
-
-// ─────────────────────────────────────────────
-// MARK: - HELPERS
-// ─────────────────────────────────────────────
-
-/// Apply a consistent "card" appearance to any UIView.
-static void ApplyCardStyle(UIView *v, BOOL elevated) {
-    v.backgroundColor    = elevated ? kColorSurface2 : kColorSurface;
-    v.layer.cornerRadius = 10.0f;
-    v.layer.borderWidth  = 0.5f;
-    v.layer.borderColor  = [UIColor colorWithWhite:1.0f alpha:0.05f].CGColor;
-    // Subtle inner-shadow effect via shadow on the layer
-    v.layer.shadowColor   = [UIColor blackColor].CGColor;
-    v.layer.shadowOpacity = 0.35f;
-    v.layer.shadowRadius  = 6.0f;
-    v.layer.shadowOffset  = CGSizeMake(0, 2);
-    v.layer.masksToBounds = NO; // allow shadow
-}
-
-/// Accent gradient layer (left→right) sized to a given rect.
-static CAGradientLayer *AccentGradientLayer(CGRect rect) {
-    CAGradientLayer *g = [CAGradientLayer layer];
-    g.frame      = rect;
-    g.colors     = @[
-        (id)[UIColor colorWithRed:1.0f green:0.306f blue:0.165f alpha:1.0f].CGColor,
-        (id)[UIColor colorWithRed:1.0f green:0.180f blue:0.100f alpha:1.0f].CGColor
-    ];
-    g.startPoint = CGPointMake(0, 0.5f);
-    g.endPoint   = CGPointMake(1, 0.5f);
-    g.cornerRadius = rect.size.height / 2.0f;
-    return g;
-}
-
 
 @interface ModMenuViewController () <UIGestureRecognizerDelegate>
 @property (nonatomic, assign) MenuTab currentTab;
@@ -113,9 +78,11 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    // Đảm bảo View gốc luôn bao phủ toàn bộ màn hình game chính xác
     self.view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.view.backgroundColor = [UIColor clearColor];
     self.view.multipleTouchEnabled = YES;
+    self.view.userInteractionEnabled = YES;
 
     _trackingPointerId = -1;
     _currentTab        = MenuTabESP;
@@ -136,13 +103,34 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     [self.view addGestureRecognizer:tap];
 }
 
+// FIX 1: Sửa lại hàm load vị trí, tính toán an toàn tránh văng menu ra ngoài rìa màn hình
 - (CGPoint)loadPanelPosition {
-    CGFloat x = [[NSUserDefaults standardUserDefaults] floatForKey:@"FloatingPanelX"];
-    CGFloat y = [[NSUserDefaults standardUserDefaults] floatForKey:@"FloatingPanelY"];
-    if (x <= 0 && y <= 0) {
-        CGRect screen = [UIScreen mainScreen].bounds;
-        x = screen.size.width - kPanelWidth - 24.0f;
-        y = 80.0f;
+    CGRect screen = [UIScreen mainScreen].bounds;
+    
+    // Nếu kích thước màn hình bị đảo ngược do hướng game (ngang/dọc)
+    CGFloat screenW = MAX(screen.size.width, screen.size.height);
+    CGFloat screenH = MIN(screen.size.width, screen.size.height);
+    
+    // Đọc vị trí đã lưu
+    id savedX = [[NSUserDefaults standardUserDefaults] objectForKey:@"FloatingPanelX"];
+    id savedY = [[NSUserDefaults standardUserDefaults] objectForKey:@"FloatingPanelY"];
+    
+    CGFloat x, y;
+    if (!savedX || !savedY) {
+        // Lần đầu mở menu: Tự động căn giữa màn hình cho chắc chắn nhìn thấy
+        x = (screenW - kPanelWidth) / 2.0f;
+        y = (screenH - kPanelHeight) / 2.0f;
+    } else {
+        x = [savedX floatValue];
+        y = [savedY floatValue];
+        
+        // Kiểm tra an toàn: Nếu vị trí lưu nằm ngoài phạm vi màn hình hiện tại thì đưa về vị trí mặc định
+        if (x < 0 || x > (screenW - kPanelWidth)) {
+            x = screenW - kPanelWidth - 24.0f;
+        }
+        if (y < 0 || y > (screenH - kPanelHeight)) {
+            y = 80.0f;
+        }
     }
     return CGPointMake(x, y);
 }
@@ -152,21 +140,21 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
 // ─────────────────────────────────────────────
 
 - (void)setupFloatingPanel {
-    _floatingPanel = [[UIView alloc] initWithFrame:CGRectMake(50, 50, kPanelWidth, kPanelHeight)];
+    // FIX 2: Thay vì gán cứng (50, 50), lấy vị trí chuẩn từ hàm loadPanelPosition đã tối ưu ở trên
+    CGPoint savedPos = [self loadPanelPosition];
+    _floatingPanel = [[UIView alloc] initWithFrame:CGRectMake(savedPos.x, savedPos.y, kPanelWidth, kPanelHeight)];
     _floatingPanel.backgroundColor  = kColorBG;
     _floatingPanel.layer.cornerRadius = 16.0f;
     _floatingPanel.layer.borderWidth  = 0.5f;
     _floatingPanel.layer.borderColor  = [UIColor colorWithWhite:1.0f alpha:0.08f].CGColor;
     _floatingPanel.clipsToBounds      = YES;
 
-    // Outer shadow (soft, natural for dark UI)
     _floatingPanel.layer.shadowColor   = [UIColor blackColor].CGColor;
     _floatingPanel.layer.shadowOpacity = 0.45f;
     _floatingPanel.layer.shadowRadius  = 24.0f;
     _floatingPanel.layer.shadowOffset  = CGSizeMake(0, 8);
     _floatingPanel.layer.masksToBounds = NO;
 
-    // Thin top-edge accent line (Neon Red/Orange)
     UIView *topLine = [[UIView alloc] initWithFrame:CGRectMake(0, 0, kPanelWidth, 2.0f)];
     CAGradientLayer *lineGrad = [CAGradientLayer layer];
     lineGrad.frame  = topLine.bounds;
@@ -230,7 +218,6 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         [_tabButtons addObject:btn];
     }
 
-    // Separator — subtle vertical line
     UIView *sep = [[UIView alloc] initWithFrame:CGRectMake(kSidebarWidth - 1, kSeparatorPadding,
                                                            1, kPanelHeight - kSeparatorPadding * 2)];
     sep.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.06f];
@@ -242,26 +229,22 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
 // ─────────────────────────────────────────────
 
 - (void)setupHeaderBar {
-    // Header background strip
     UIView *headerBG = [[UIView alloc] initWithFrame:CGRectMake(kSidebarWidth, 0,
                                                                 kPanelWidth - kSidebarWidth, kHeaderHeight)];
     headerBG.backgroundColor = kColorSurface;
     [_floatingPanel addSubview:headerBG];
 
-    // Bottom border of header
     UIView *hLine = [[UIView alloc] initWithFrame:CGRectMake(0, kHeaderHeight - 1,
                                                               kPanelWidth - kSidebarWidth, 1)];
     hLine.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.05f];
     [headerBG addSubview:hLine];
 
-    // Draggable header button (invisible tap region + title)
     CGFloat headerButtonWidth = kPanelWidth - kSidebarWidth - 52;
     _headerButton = [UIButton buttonWithType:UIButtonTypeCustom];
     _headerButton.frame = CGRectMake(kSidebarWidth, 0, headerButtonWidth, kHeaderHeight);
     _headerButton.backgroundColor = [UIColor clearColor];
     [_floatingPanel addSubview:_headerButton];
 
-    // Icon badge
     UIView *iconBadge = [[UIView alloc] initWithFrame:CGRectMake(14, 12, 28, 28)];
     iconBadge.backgroundColor = kColorAccentBg;
     iconBadge.layer.cornerRadius = 8.0f;
@@ -281,7 +264,6 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     [iconBadge addSubview:headerIcon];
     [_headerButton addSubview:iconBadge];
 
-    // Title
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, headerButtonWidth - 58, kHeaderHeight)];
     titleLabel.tag           = 2002;
     titleLabel.font          = [UIFont systemFontOfSize:14 weight:UIFontWeightBold];
@@ -289,7 +271,6 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     titleLabel.textAlignment = NSTextAlignmentLeft;
     [_headerButton addSubview:titleLabel];
 
-    // Sub-label "TACTICAL SUITE"
     UILabel *subLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 30, headerButtonWidth - 58, 14)];
     subLabel.font      = [UIFont systemFontOfSize:9 weight:UIFontWeightMedium];
     subLabel.textColor = kColorMuted;
@@ -299,7 +280,6 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     subLabel.attributedText = subAS;
     [_headerButton addSubview:subLabel];
 
-    // Close button
     CGFloat btnSize = 32.0f;
     _closeButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _closeButton.frame           = CGRectMake(kPanelWidth - 44, (kHeaderHeight - btnSize) / 2, btnSize, btnSize);
@@ -347,7 +327,6 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     _contentContainer.backgroundColor = [UIColor clearColor];
     [_contentScrollView addSubview:_contentContainer];
 
-    // Scrollbar track
     _scrollbarTrack = [[UIView alloc] initWithFrame:CGRectMake(scrollWidth + 2, 6,
                                                                 kScrollBarWidth, contentHeight - 12)];
     _scrollbarTrack.backgroundColor  = [UIColor colorWithWhite:1.0f alpha:0.04f];
@@ -355,7 +334,6 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     _scrollbarTrack.tag = 5000;
     [contentClipView addSubview:_scrollbarTrack];
 
-    // Scrollbar thumb
     _scrollbarThumb = [[UIView alloc] initWithFrame:CGRectMake(scrollWidth + 2, 6,
                                                                 kScrollBarWidth, 40.0f)];
     _scrollbarThumb.backgroundColor  = kColorAccent;
@@ -367,10 +345,6 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     _scrollbarThumb.tag = 5001;
     [contentClipView addSubview:_scrollbarThumb];
 }
-
-// ─────────────────────────────────────────────
-// MARK: - Scrollbar Layout
-// ─────────────────────────────────────────────
 
 - (void)updateScrollbarLayout {
     CGFloat contentH = _contentScrollView.contentSize.height;
@@ -466,7 +440,6 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         NSString *title = row[0];
         NSString *key   = row[1];
 
-        // ── Exit HUD row ──────────────────────────
         if ([key isEqualToString:@"__exit_hud__"]) {
             UIView *rowView = [[UIView alloc] initWithFrame:CGRectMake(8, y,
                                                                         contentWidth - 16, kRowHeight)];
@@ -490,7 +463,6 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
             continue;
         }
 
-        // ── Normal toggle row ──────────────────────
         UIView *rowView = [[UIView alloc] initWithFrame:CGRectMake(8, y,
                                                                     contentWidth - 16, kRowHeight)];
         rowView.backgroundColor  = kColorSurface;
@@ -518,7 +490,6 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         }
         sw.on = on;
 
-        // Highlight active rows
         if (on) {
             rowView.backgroundColor = [UIColor colorWithRed:1.0f green:0.306f blue:0.165f alpha:0.07f];
             rowView.layer.borderColor = [UIColor colorWithRed:1.0f green:0.306f blue:0.165f alpha:0.20f].CGColor;
@@ -531,11 +502,9 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         y += kRowHeight + 5.0f;
     }
 
-    // ── Aimbot extras ──────────────────────────────
     if (tab == MenuTabAimbot) {
         CGFloat rowW = contentWidth - 16;
 
-        // Section divider
         y += 4;
         UIView *divider = [[UIView alloc] initWithFrame:CGRectMake(8, y, rowW, 1)];
         divider.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.05f];
@@ -554,7 +523,6 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         y = [self addSegmentedComboRowWithTitle:@"Target Mode"  key:@"AimTargetMode" y:y width:rowW];
         y += 6;
 
-        // Section divider
         UIView *div2 = [[UIView alloc] initWithFrame:CGRectMake(8, y, rowW, 1)];
         div2.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.05f];
         [_contentContainer addSubview:div2];
@@ -656,7 +624,6 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     [[NSUserDefaults standardUserDefaults] synchronize];
     ESPPrefsSync();
 
-    // Update row highlight to match new state
     UIView *rowView = sender.superview;
     if (rowView) {
         rowView.backgroundColor = value
@@ -834,6 +801,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     [self loadTabContent:tab];
 }
 
+// FIX 3: Khi lưu vị trí cũ, thực hiện đồng bộ ngay (synchronize) để dữ liệu lưu chính xác
 - (void)closeTapped {
     [[NSUserDefaults standardUserDefaults] setFloat:_floatingPanel.frame.origin.x forKey:@"FloatingPanelX"];
     [[NSUserDefaults standardUserDefaults] setFloat:_floatingPanel.frame.origin.y forKey:@"FloatingPanelY"];
@@ -917,6 +885,9 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
                 CGFloat viewH    = _contentScrollView.bounds.size.height;
                 CGFloat maxOffset = contentH - viewH;
                 if (maxOffset > 0 && trackH > 0) {
+                    [[NSUserDefaults standardUserDefaults] setFloat:_floatingPanel.frame.origin.x forKey:@"FloatingPanelX"];
+                    [[NSUserDefaults standardUserDefaults] setFloat:_floatingPanel.frame.origin.y forKey:@"FloatingPanelY"];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
                     CGFloat thumbY = _scrollbarThumb.frame.origin.y;
                     CGFloat thumbH = _scrollbarThumb.frame.size.height;
                     if (trackY >= thumbY && trackY <= thumbY + thumbH) {
@@ -988,7 +959,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         if (ratio < 0) ratio = 0;
         if (ratio > 1) ratio = 1;
         sl.value = sl.minimumValue + (float)ratio * (sl.maximumValue - sl.minimumValue);
-        [self sliderChanged:sl];
+        [sl sendActionsForControlEvents:UIControlEventValueChanged];
         return YES;
     }
 
