@@ -41,10 +41,11 @@
     CAGradientLayer *gradient = [CAGradientLayer layer];
     gradient.frame = view.bounds;
 
+    // SỬA: Chuyển gradient màu mè thành màu xám tối giản đồng bộ
     gradient.colors = @[
-        (__bridge id)[UIColor colorWithRed:0.08 green:0.09 blue:0.16 alpha:1.0].CGColor,
-        (__bridge id)[UIColor colorWithRed:0.17 green:0.05 blue:0.28 alpha:1.0].CGColor,
-        (__bridge id)[UIColor colorWithRed:0.28 green:0.06 blue:0.45 alpha:1.0].CGColor
+        (__bridge id)[UIColor colorWithWhite:0.12 alpha:1.0].CGColor,
+        (__bridge id)[UIColor colorWithWhite:0.10 alpha:1.0].CGColor,
+        (__bridge id)[UIColor colorWithWhite:0.08 alpha:1.0].CGColor
     ];
 
     gradient.startPoint = CGPointMake(0, 0);
@@ -60,8 +61,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.view.backgroundColor =
-    [UIColor colorWithRed:0.03 green:0.03 blue:0.06 alpha:1.0];
+    // SỬA: Đổi nền chính thành màu đen thuần
+    self.view.backgroundColor = [UIColor blackColor];
 
     //
     // Background glow
@@ -73,8 +74,10 @@
     UIViewAutoresizingFlexibleHeight;
 
     bgGlow.userInteractionEnabled = NO;
+    
+    // SỬA: Đổi màu nền mờ thành màu xám rất nhẹ thay vì màu tím
     bgGlow.backgroundColor =
-    [[UIColor purpleColor] colorWithAlphaComponent:0.04];
+    [[UIColor whiteColor] colorWithAlphaComponent:0.01];
 
     [self.view addSubview:bgGlow];
 
@@ -89,10 +92,11 @@
 
     _titleLabel.textColor = [UIColor whiteColor];
 
+    // SỬA: Đổi shadow chữ thành màu trắng mờ tinh tế
     _titleLabel.layer.shadowColor =
-    [UIColor purpleColor].CGColor;
+    [UIColor whiteColor].CGColor;
 
-    _titleLabel.layer.shadowOpacity = 0.9;
+    _titleLabel.layer.shadowOpacity = 0.15;
     _titleLabel.layer.shadowRadius = 16;
     _titleLabel.layer.shadowOffset = CGSizeZero;
 
@@ -119,14 +123,16 @@
     //
 
     _glowView = [[UIView alloc] initWithFrame:CGRectZero];
+    
+    // SỬA: Đổi vùng phát sáng phía sau thành màu đen/xám mờ ẩn đi cho đỡ rối mắt
     _glowView.backgroundColor =
-    [[UIColor purpleColor] colorWithAlphaComponent:0.25];
+    [[UIColor blackColor] colorWithAlphaComponent:0.2];
 
     _glowView.layer.cornerRadius = 34;
     _glowView.layer.shadowColor =
-    [UIColor magentaColor].CGColor;
+    [UIColor whiteColor].CGColor;
 
-    _glowView.layer.shadowOpacity = 1.0;
+    _glowView.layer.shadowOpacity = 0.05; // Giảm tối đa độ đậm shadow bóng loáng
     _glowView.layer.shadowRadius = 45;
     _glowView.layer.shadowOffset = CGSizeZero;
 
@@ -158,7 +164,7 @@
 
     _cardView.layer.borderWidth = 1.2;
     _cardView.layer.borderColor =
-    [[UIColor whiteColor] colorWithAlphaComponent:0.10].CGColor;
+    [[UIColor whiteColor] colorWithAlphaComponent:0.08].CGColor;
 
     //
     // HUD Label
@@ -185,8 +191,8 @@
     [UIFont systemFontOfSize:12
                       weight:UIFontWeightBold];
 
-    _hudStatusLabel.textColor =
-    [UIColor colorWithRed:0.4 green:1 blue:0.7 alpha:1];
+    // SỬA: Trạng thái mặc định chữ màu trắng thay vì màu xanh lục
+    _hudStatusLabel.textColor = [UIColor whiteColor];
 
     _hudStatusLabel.text = @"ONLINE";
 
@@ -197,16 +203,16 @@
     //
 
     _statusDot = [[UIView alloc] initWithFrame:CGRectZero];
-    _statusDot.backgroundColor =
-    [UIColor colorWithRed:0.4 green:1 blue:0.7 alpha:1];
+    
+    // SỬA: Dấu chấm trạng thái đổi sang màu trắng
+    _statusDot.backgroundColor = [UIColor whiteColor];
 
     _statusDot.layer.cornerRadius = 5;
 
-    _statusDot.layer.shadowColor =
-    [UIColor greenColor].CGColor;
-
-    _statusDot.layer.shadowOpacity = 1;
-    _statusDot.layer.shadowRadius = 10;
+    // SỬA: Loại bỏ shadow phát sáng màu xanh của dấu chấm
+    _statusDot.layer.shadowColor = [UIColor whiteColor].CGColor;
+    _statusDot.layer.shadowOpacity = 0.2;
+    _statusDot.layer.shadowRadius = 4;
     _statusDot.layer.shadowOffset = CGSizeZero;
 
     [_cardView addSubview:_statusDot];
@@ -217,16 +223,15 @@
 
     _hudSwitch = [[UISwitch alloc] initWithFrame:CGRectZero];
 
-    _hudSwitch.onTintColor =
-    [UIColor colorWithRed:0.8 green:0.2 blue:1 alpha:1];
+    // SỬA: Đổi màu công tắc khi bật sang màu trắng tối giản thay vì màu tím dâu
+    _hudSwitch.onTintColor = [UIColor whiteColor];
 
-    _hudSwitch.thumbTintColor = [UIColor whiteColor];
+    _hudSwitch.thumbTintColor = [UIColor colorWithWhite:0.2 alpha:1.0];
 
-    _hudSwitch.layer.shadowColor =
-    [UIColor magentaColor].CGColor;
-
-    _hudSwitch.layer.shadowOpacity = 0.8;
-    _hudSwitch.layer.shadowRadius = 15;
+    // SỬA: Xóa shadow màu hồng cánh sen của nút gạt switch
+    _hudSwitch.layer.shadowColor = [UIColor blackColor].CGColor;
+    _hudSwitch.layer.shadowOpacity = 0.3;
+    _hudSwitch.layer.shadowRadius = 5;
     _hudSwitch.layer.shadowOffset = CGSizeZero;
 
     [_hudSwitch addTarget:self
@@ -290,10 +295,10 @@
 
     _autoCleanSwitch = [[UISwitch alloc] initWithFrame:CGRectZero];
 
-    _autoCleanSwitch.onTintColor =
-    [UIColor colorWithRed:0.2 green:0.85 blue:1 alpha:1];
+    // SỬA: Đổi màu nút auto clean khi bật thành màu trắng đồng điệu
+    _autoCleanSwitch.onTintColor = [UIColor whiteColor];
 
-    _autoCleanSwitch.thumbTintColor = [UIColor whiteColor];
+    _autoCleanSwitch.thumbTintColor = [UIColor colorWithWhite:0.2 alpha:1.0];
 
     _autoCleanSwitch.on =
     [[NSUserDefaults standardUserDefaults]
@@ -312,8 +317,9 @@
     CABasicAnimation *pulse =
     [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
 
-    pulse.fromValue = @(0.25);
-    pulse.toValue = @(1.0);
+    // SỬA: Hạ thấp cường độ nhấp nháy bóng mờ để không gây mỏi mắt
+    pulse.fromValue = @(0.02);
+    pulse.toValue = @(0.1);
 
     pulse.duration = 1.2;
     pulse.autoreverses = YES;
@@ -601,11 +607,12 @@
         _descLabel.alpha = 0.45;
 
         _hudStatusLabel.text = @"OFFLINE";
-        _hudStatusLabel.textColor =
-        [UIColor colorWithRed:1 green:0.3 blue:0.3 alpha:1];
+        
+        // SỬA: Khi offline đổi chữ trạng thái thành xám nhạt thay vì đỏ lòe
+        _hudStatusLabel.textColor = [UIColor colorWithWhite:0.5 alpha:1.0];
 
-        _statusDot.backgroundColor =
-        [UIColor redColor];
+        // SỬA: Chấm tròn chuyển sang xám đậm khi offline
+        _statusDot.backgroundColor = [UIColor colorWithWhite:0.3 alpha:1.0];
 
         _pendingHUDEnableUntil = 0;
 
@@ -616,11 +623,10 @@
     _descLabel.alpha = 1.0;
 
     _hudStatusLabel.text = @"ONLINE";
-    _hudStatusLabel.textColor =
-    [UIColor colorWithRed:0.4 green:1 blue:0.7 alpha:1];
-
-    _statusDot.backgroundColor =
-    [UIColor colorWithRed:0.4 green:1 blue:0.7 alpha:1];
+    
+    // SỬA: Khi online chữ trạng thái và chấm tròn chuyển sang màu trắng tối giản
+    _hudStatusLabel.textColor = [UIColor whiteColor];
+    _statusDot.backgroundColor = [UIColor whiteColor];
 
     CFTimeInterval now =
     CACurrentMediaTime();
