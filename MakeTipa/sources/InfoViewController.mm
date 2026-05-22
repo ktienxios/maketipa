@@ -13,14 +13,14 @@
     if (!self) return nil;
     self.backgroundColor = [UIColor clearColor];
 
-    // Nhãn bên trái: Chữ màu trắng nguyên bản
+    // Nhãn bên trái: Giữ nguyên chữ màu trắng
     _leftLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _leftLabel.text = left ?: @"";
     _leftLabel.font = [UIFont systemFontOfSize:15 weight:UIFontWeightMedium];
     _leftLabel.textColor = [UIColor whiteColor];
     [self addSubview:_leftLabel];
 
-    // SỬA: Thay thế màu hồng nhạt cũ thành màu trắng mờ (Xám nhạt) tinh tế
+    // SỬA: Đổi màu chữ bên phải từ hồng nhạt sang trắng mờ (xám nhạt) để hài hòa với giao diện tối giản
     _rightLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _rightLabel.text = right ?: @"—";
     _rightLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightRegular];
@@ -33,8 +33,7 @@
 }
 
 - (void)layoutSubviews {
-    [super copy]; // Đảm bảo cấu trúc hiển thị
-    [super layoutSubviews];
+    [super layoutSubviews]; // Đã sửa: Hoàn tác về đúng hàm gốc, loại bỏ hoàn toàn lệnh lỗi gây văng app
     CGFloat w = self.bounds.size.width;
     CGFloat h = self.bounds.size.height;
     
@@ -57,29 +56,30 @@
 
 #pragma mark - Theme Đồng Bộ (Monochrome)
 
-// SỬA: Đổi màu Accent chủ đạo từ Hồng sang Trắng hoàn toàn để đồng bộ Home Panel
+// SỬA: Thay thế màu hồng anh đào rực bằng màu trắng tối giản làm màu điểm nhấn
 - (UIColor *)accent { return [UIColor whiteColor]; }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // 1. SỬA: Đổi nền Gradient Midnight Purple thành màu đen thuần giống hệt HomeViewController
+    // 1. SỬA: Thay đổi nền Gradient Midnight Purple thành nền đen thuần hoàn toàn giống HomeViewController
     CAGradientLayer *bg = [CAGradientLayer layer];
     bg.frame = self.view.bounds;
     bg.colors = @[
         (__bridge id)[UIColor blackColor].CGColor,
         (__bridge id)[UIColor blackColor].CGColor
     ];
+    bg.locations = @[@0.0, @0.5, @1.0];
     [self.view.layer insertSublayer:bg atIndex:0];
 
-    // 2. Tiêu đề chính phát sáng tinh tế
+    // 2. Tiêu đề chính phát sáng nhẹ tinh tế
     _titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _titleLabel.text = @"BUILD INFO";
     _titleLabel.font = [UIFont systemFontOfSize:38 weight:UIFontWeightBlack];
     _titleLabel.textColor = [UIColor whiteColor];
     _titleLabel.layer.shadowColor = [UIColor whiteColor].CGColor;
     _titleLabel.layer.shadowRadius = 16;
-    _titleLabel.layer.shadowOpacity = 0.15; // Hạ shadow mờ ảo dịu mắt giống Home Panel
+    _titleLabel.layer.shadowOpacity = 0.15; // Giảm độ mờ shadow cho dịu mắt giống Home Panel
     _titleLabel.layer.shadowOffset = CGSizeZero;
     [self.view addSubview:_titleLabel];
 
@@ -87,26 +87,26 @@
     _subTitleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _subTitleLabel.text = @"APPLICATION METADATA & SPECS";
     _subTitleLabel.font = [UIFont systemFontOfSize:11 weight:UIFontWeightBold];
-    _subTitleLabel.textColor = [UIColor colorWithWhite:1 alpha:0.55]; // Thay thế màu hồng bằng màu xám mờ
+    _subTitleLabel.textColor = [UIColor colorWithWhite:1.0 alpha:0.55]; // SỬA: Đổi chữ từ hồng sang màu xám mờ
     [self.view addSubview:_subTitleLabel];
 
-    // 3. Khung Card chứa thông tin kiểu Kính Mờ (Glassmorphism) tối giản
+    // 3. Khung Card chứa thông tin kiểu Kính Mờ (Glassmorphism)
     _cardView = [[UIView alloc] initWithFrame:CGRectZero];
     _cardView.layer.cornerRadius = 24;
     _cardView.clipsToBounds = YES;
     
-    // SỬA: Viền kính trắng mờ mỏng tinh tế thay cho viền hồng cũ
+    // SỬA: Đổi viền hồng Neon thành viền kính trắng mờ mỏng
     _cardView.layer.borderWidth = 1.2;
     _cardView.layer.borderColor = [[UIColor whiteColor] colorWithAlphaComponent:0.08].CGColor;
     
-    // SỬA: Đổ bóng xám nhẹ nhàng sau lưng Card
+    // SỬA: Đổi bóng đổ lan tỏa phía sau thành màu đen mờ sâu thẳm
     _cardView.layer.shadowColor = [UIColor blackColor].CGColor;
-    _cardView.layer.shadowOpacity = 0.3;
+    _cardView.layer.shadowOpacity = 0.30;
     _cardView.layer.shadowRadius = 20;
     _cardView.layer.shadowOffset = CGSizeZero;
     [self.view addSubview:_cardView];
 
-    // SỬA: Lớp phủ Gradient xám/đen mờ mịn phía trong Card đồng bộ với Card bên Home Panel
+    // SỬA: Thay thế gradient hồng bên trong Card thành tông xám tối đồng bộ với Card của Home Panel
     _cardGradient = [CAGradientLayer layer];
     _cardGradient.colors = @[
         (__bridge id)[UIColor colorWithWhite:0.12 alpha:1.0].CGColor,
@@ -146,7 +146,7 @@
         [_cardView addSubview:_rows[i]];
         if (i != _rows.count - 1) {
             UIView *sep = [[UIView alloc] initWithFrame:CGRectZero];
-            // SỬA: Thanh chia mỏng màu xám mờ đồng bộ (tag=999 giống bên Home)
+            // SỬA: Thay thế thanh chia màu hồng bằng màu xám mờ đồng bộ (giống line bên Home)
             sep.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.08];
             sep.tag = 9000 + (int)i;
             [_cardView addSubview:sep];
@@ -159,14 +159,14 @@
     UIEdgeInsets insets = self.view.safeAreaInsets;
     CGFloat w = self.view.bounds.size.width;
 
-    // Định vị Tiêu đề giống hệt bên HomeViewController
-    _titleLabel.frame = CGRectMake(24, insets.top + 18, w - 48, 48);
+    // Định vị Tiêu đề
+    _titleLabel.frame = CGRectMake(24, insets.top + 24, w - 48, 44);
     _subTitleLabel.frame = CGRectMake(26, CGRectGetMaxY(_titleLabel.frame) + 2, w - 52, 18);
 
     // Định vị Card thông tin
-    CGFloat cardX = 18;
-    CGFloat cardW = w - 36;
-    CGFloat cardY = CGRectGetMaxY(_subTitleLabel.frame) + 20;
+    CGFloat cardX = 16;
+    CGFloat cardW = w - 32;
+    CGFloat cardY = CGRectGetMaxY(_subTitleLabel.frame) + 24;
     CGFloat rowH = 52; 
     CGFloat cardH = rowH * _rows.count;
     _cardView.frame = CGRectMake(cardX, cardY, cardW, cardH);
@@ -182,7 +182,7 @@
         
         UIView *sep = [_cardView viewWithTag:9000 + (int)i];
         if (sep) {
-            sep.frame = CGRectMake(20, CGRectGetMaxY(rv.frame) - 0.5f, cardW - 40, 0.5f);
+            sep.frame = CGRectMake(16, CGRectGetMaxY(rv.frame) - 0.5f, cardW - 32, 0.5f);
         }
     }
 }
