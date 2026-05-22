@@ -21,33 +21,23 @@ static const CGFloat kScrollBarWidth  = 3.0f;
 static const CGFloat kTabStartY       = 22.0f;
 
 // ─────────────────────────────────────────────
-// MARK: - COLOUR PALETTE  (Clean White)
-//   Background  #F4F6F9  light grey-white
-//   Surface     #FFFFFF  pure white cards
-//   Surface2    #EEF1F5  slightly deeper
-//   SidebarBG   #F0F2F6  sidebar tint
-//   Border      #00000010 soft hairline
-//   Accent      #2563EB  vivid blue
-//   AccentSoft  #3B82F6  lighter blue
-//   Text        #0F172A  near-black
-//   TextMuted   #94A3B8  slate-400
-//   Danger      #EF4444  red
+// MARK: - COLOUR PALETTE  (Premium Dark Mode)
 // ─────────────────────────────────────────────
-#define kColorBG         [UIColor colorWithRed:0.957f green:0.965f blue:0.976f alpha:1.0f]
-#define kColorSurface    [UIColor colorWithWhite:1.0f alpha:1.0f]
-#define kColorSurface2   [UIColor colorWithRed:0.933f green:0.945f blue:0.961f alpha:1.0f]
-#define kColorSidebarBG  [UIColor colorWithRed:0.941f green:0.949f blue:0.965f alpha:1.0f]
-#define kColorBorder     [UIColor colorWithWhite:0.0f alpha:0.07f]
-#define kColorAccent     [UIColor colorWithRed:0.145f green:0.388f blue:0.922f alpha:1.0f]
-#define kColorAccentSoft [UIColor colorWithRed:0.231f green:0.510f blue:0.965f alpha:1.0f]
-#define kColorAccentBg   [UIColor colorWithRed:0.145f green:0.388f blue:0.922f alpha:0.08f]
-#define kColorText       [UIColor colorWithRed:0.059f green:0.090f blue:0.165f alpha:1.0f]
-#define kColorMuted      [UIColor colorWithRed:0.580f green:0.639f blue:0.722f alpha:1.0f]
+#define kColorBG         [UIColor colorWithRed:0.067f green:0.078f blue:0.106f alpha:1.0f] // #11141B
+#define kColorSurface    [UIColor colorWithRed:0.102f green:0.122f blue:0.161f alpha:1.0f] // #1A1F29
+#define kColorSurface2   [UIColor colorWithRed:0.141f green:0.165f blue:0.220f alpha:1.0f] // #242A38
+#define kColorSidebarBG  [UIColor colorWithRed:0.082f green:0.094f blue:0.129f alpha:1.0f] // #151821
+#define kColorBorder     [UIColor colorWithWhite:1.0f alpha:0.05f]
+#define kColorAccent     [UIColor colorWithRed:1.000f green:0.302f blue:0.165f alpha:1.0f] // #FF4D2A (Neon Orange/Red)
+#define kColorAccentSoft [UIColor colorWithRed:1.000f green:0.416f blue:0.298f alpha:1.0f]
+#define kColorAccentBg   [UIColor colorWithRed:1.000f green:0.302f blue:0.165f alpha:0.12f]
+#define kColorText       [UIColor colorWithRed:0.941f green:0.953f blue:0.969f alpha:1.0f] // #F0F3F7
+#define kColorMuted      [UIColor colorWithRed:0.478f green:0.541f blue:0.643f alpha:1.0f] // #7A8A4
 #define kColorDanger     [UIColor colorWithRed:0.937f green:0.267f blue:0.267f alpha:1.0f]
-#define kColorDangerSurf [UIColor colorWithRed:1.0f   green:0.929f blue:0.929f alpha:1.0f]
+#define kColorDangerSurf [UIColor colorWithRed:0.220f green:0.102f blue:0.102f alpha:1.0f]
 
-// Legacy accent RGB — updated to blue
-static const CGFloat kAccentR = 0.145f, kAccentG = 0.388f, kAccentB = 0.922f;
+// Legacy accent RGB — updated to match Neon Red/Orange
+static const CGFloat kAccentR = 1.000f, kAccentG = 0.302f, kAccentB = 0.165f;
 
 static const NSInteger kSegmentTrackTag = 9101;
 static const NSInteger kSegmentLabelTag = 9201;
@@ -66,7 +56,7 @@ static void ApplyCardStyle(UIView *v, BOOL elevated) {
     v.backgroundColor    = elevated ? kColorSurface2 : kColorSurface;
     v.layer.cornerRadius = 10.0f;
     v.layer.borderWidth  = 0.5f;
-    v.layer.borderColor  = [UIColor colorWithWhite:1.0f alpha:0.07f].CGColor;
+    v.layer.borderColor  = [UIColor colorWithWhite:1.0f alpha:0.05f].CGColor;
     // Subtle inner-shadow effect via shadow on the layer
     v.layer.shadowColor   = [UIColor blackColor].CGColor;
     v.layer.shadowOpacity = 0.35f;
@@ -166,24 +156,23 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     _floatingPanel.backgroundColor  = kColorBG;
     _floatingPanel.layer.cornerRadius = 16.0f;
     _floatingPanel.layer.borderWidth  = 0.5f;
-    _floatingPanel.layer.borderColor  = [UIColor colorWithWhite:1.0f alpha:0.10f].CGColor;
+    _floatingPanel.layer.borderColor  = [UIColor colorWithWhite:1.0f alpha:0.08f].CGColor;
     _floatingPanel.clipsToBounds      = YES;
 
-    // Outer shadow (soft, natural for light UI)
-    _floatingPanel.layer.shadowColor   = [UIColor colorWithWhite:0.0f alpha:0.18f].CGColor;
-    _floatingPanel.layer.shadowOpacity = 1.0f;
+    // Outer shadow (soft, natural for dark UI)
+    _floatingPanel.layer.shadowColor   = [UIColor blackColor].CGColor;
+    _floatingPanel.layer.shadowOpacity = 0.45f;
     _floatingPanel.layer.shadowRadius  = 24.0f;
     _floatingPanel.layer.shadowOffset  = CGSizeMake(0, 8);
     _floatingPanel.layer.masksToBounds = NO;
-    _floatingPanel.layer.borderColor   = [UIColor colorWithWhite:0.0f alpha:0.07f].CGColor;
 
-    // Thin top-edge accent line (blue)
+    // Thin top-edge accent line (Neon Red/Orange)
     UIView *topLine = [[UIView alloc] initWithFrame:CGRectMake(0, 0, kPanelWidth, 2.0f)];
     CAGradientLayer *lineGrad = [CAGradientLayer layer];
     lineGrad.frame  = topLine.bounds;
     lineGrad.colors = @[
         (id)[UIColor clearColor].CGColor,
-        (id)[UIColor colorWithRed:0.145f green:0.388f blue:0.922f alpha:0.8f].CGColor,
+        (id)[UIColor colorWithRed:1.000f green:0.302f blue:0.165f alpha:0.8f].CGColor,
         (id)[UIColor clearColor].CGColor
     ];
     lineGrad.startPoint = CGPointMake(0, 0.5f);
@@ -219,11 +208,11 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         if (active) {
             btn.backgroundColor = kColorAccentBg;
             btn.layer.borderWidth = 1.0f;
-            btn.layer.borderColor = [UIColor colorWithRed:0.145f green:0.388f blue:0.922f alpha:0.35f].CGColor;
+            btn.layer.borderColor = [UIColor colorWithRed:1.000f green:0.302f blue:0.165f alpha:0.35f].CGColor;
         } else {
-            btn.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.04f];
+            btn.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.03f];
             btn.layer.borderWidth = 1.0f;
-            btn.layer.borderColor = [UIColor colorWithWhite:0.0f alpha:0.07f].CGColor;
+            btn.layer.borderColor = [UIColor colorWithWhite:1.0f alpha:0.05f].CGColor;
         }
 
         UIImage *img = [UIImage systemImageNamed:icons[i]];
@@ -244,7 +233,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     // Separator — subtle vertical line
     UIView *sep = [[UIView alloc] initWithFrame:CGRectMake(kSidebarWidth - 1, kSeparatorPadding,
                                                            1, kPanelHeight - kSeparatorPadding * 2)];
-    sep.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.07f];
+    sep.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.06f];
     [_floatingPanel addSubview:sep];
 }
 
@@ -262,7 +251,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     // Bottom border of header
     UIView *hLine = [[UIView alloc] initWithFrame:CGRectMake(0, kHeaderHeight - 1,
                                                               kPanelWidth - kSidebarWidth, 1)];
-    hLine.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.06f];
+    hLine.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.05f];
     [headerBG addSubview:hLine];
 
     // Draggable header button (invisible tap region + title)
@@ -277,7 +266,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     iconBadge.backgroundColor = kColorAccentBg;
     iconBadge.layer.cornerRadius = 8.0f;
     iconBadge.layer.borderWidth  = 0.5f;
-    iconBadge.layer.borderColor  = [UIColor colorWithRed:0.145f green:0.388f blue:0.922f alpha:0.3f].CGColor;
+    iconBadge.layer.borderColor  = [UIColor colorWithRed:1.000f green:0.302f blue:0.165f alpha:0.3f].CGColor;
 
     UIImageView *headerIcon = [[UIImageView alloc] initWithFrame:CGRectMake(5, 5, 18, 18)];
     UIImage *scopeImg = [UIImage systemImageNamed:@"scope"];
@@ -314,10 +303,10 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     CGFloat btnSize = 32.0f;
     _closeButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _closeButton.frame           = CGRectMake(kPanelWidth - 44, (kHeaderHeight - btnSize) / 2, btnSize, btnSize);
-    _closeButton.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.05f];
+    _closeButton.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.03f];
     _closeButton.layer.cornerRadius = btnSize / 2.0f;
     _closeButton.layer.borderWidth  = 0.5f;
-    _closeButton.layer.borderColor  = [UIColor colorWithWhite:1.0f alpha:0.10f].CGColor;
+    _closeButton.layer.borderColor = [UIColor colorWithWhite:1.0f alpha:0.06f].CGColor;
 
     UIImage *closeImg = [UIImage systemImageNamed:@"xmark"];
     if (@available(iOS 13.0, *)) {
@@ -361,7 +350,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     // Scrollbar track
     _scrollbarTrack = [[UIView alloc] initWithFrame:CGRectMake(scrollWidth + 2, 6,
                                                                 kScrollBarWidth, contentHeight - 12)];
-    _scrollbarTrack.backgroundColor  = [UIColor colorWithWhite:1.0f alpha:0.06f];
+    _scrollbarTrack.backgroundColor  = [UIColor colorWithWhite:1.0f alpha:0.04f];
     _scrollbarTrack.layer.cornerRadius = kScrollBarWidth / 2.0f;
     _scrollbarTrack.tag = 5000;
     [contentClipView addSubview:_scrollbarTrack];
@@ -380,7 +369,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
 }
 
 // ─────────────────────────────────────────────
-// MARK: - Scrollbar Layout  (logic unchanged)
+// MARK: - Scrollbar Layout
 // ─────────────────────────────────────────────
 
 - (void)updateScrollbarLayout {
@@ -412,7 +401,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
 }
 
 // ─────────────────────────────────────────────
-// MARK: - Header / Sidebar Updates  (logic unchanged)
+// MARK: - Header / Sidebar Updates
 // ─────────────────────────────────────────────
 
 - (void)updateHeaderForTab:(MenuTab)tab {
@@ -430,15 +419,15 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         btn.tintColor    = active ? kColorAccent : kColorMuted;
         btn.backgroundColor = active
             ? [UIColor colorWithRed:1.0f green:0.306f blue:0.165f alpha:0.18f]
-            : [UIColor colorWithWhite:1.0f alpha:0.04f];
+            : [UIColor colorWithWhite:1.0f alpha:0.03f];
         btn.layer.borderColor = active
             ? [UIColor colorWithRed:1.0f green:0.306f blue:0.165f alpha:0.45f].CGColor
-            : [UIColor colorWithWhite:1.0f alpha:0.06f].CGColor;
+            : [UIColor colorWithWhite:1.0f alpha:0.05f].CGColor;
     }
 }
 
 // ─────────────────────────────────────────────
-// MARK: - Tab Content  (logic unchanged, styling updated)
+// MARK: - Tab Content
 // ─────────────────────────────────────────────
 
 - (void)loadTabContent:(MenuTab)tab {
@@ -507,7 +496,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         rowView.backgroundColor  = kColorSurface;
         rowView.layer.cornerRadius = 10.0f;
         rowView.layer.borderWidth  = 0.5f;
-        rowView.layer.borderColor  = [UIColor colorWithWhite:1.0f alpha:0.06f].CGColor;
+        rowView.layer.borderColor  = [UIColor colorWithWhite:1.0f alpha:0.05f].CGColor;
         objc_setAssociatedObject(rowView, "key", key, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 
         UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(14, 0, contentWidth - 90, kRowHeight)];
@@ -549,7 +538,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         // Section divider
         y += 4;
         UIView *divider = [[UIView alloc] initWithFrame:CGRectMake(8, y, rowW, 1)];
-        divider.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.06f];
+        divider.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.05f];
         [_contentContainer addSubview:divider];
         UILabel *sectionLbl = [[UILabel alloc] initWithFrame:CGRectMake(8, y + 8, rowW, 16)];
         NSMutableAttributedString *secAS = [[NSMutableAttributedString alloc] initWithString:@"CONFIGURATION"];
@@ -567,7 +556,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
 
         // Section divider
         UIView *div2 = [[UIView alloc] initWithFrame:CGRectMake(8, y, rowW, 1)];
-        div2.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.06f];
+        div2.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.05f];
         [_contentContainer addSubview:div2];
         UILabel *sec2Lbl = [[UILabel alloc] initWithFrame:CGRectMake(8, y + 8, rowW, 16)];
         NSMutableAttributedString *sec2AS = [[NSMutableAttributedString alloc] initWithString:@"PARAMETERS"];
@@ -593,7 +582,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         fovSlider.maximumValue        = 500.0f;
         fovSlider.value               = fov;
         fovSlider.minimumTrackTintColor = kColorAccent;
-        fovSlider.maximumTrackTintColor = [UIColor colorWithWhite:1.0f alpha:0.08f];
+        fovSlider.maximumTrackTintColor = [UIColor colorWithWhite:1.0f alpha:0.05f];
         fovSlider.tag                 = 6002;
         objc_setAssociatedObject(fovSlider, "key",   @"Fov",  OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(fovSlider, "label", fovLbl,  OBJC_ASSOCIATION_ASSIGN);
@@ -616,7 +605,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         distSlider.maximumValue        = 400.0f;
         distSlider.value               = aimDist;
         distSlider.minimumTrackTintColor = kColorAccent;
-        distSlider.maximumTrackTintColor = [UIColor colorWithWhite:1.0f alpha:0.08f];
+        distSlider.maximumTrackTintColor = [UIColor colorWithWhite:1.0f alpha:0.05f];
         distSlider.tag                 = 6004;
         objc_setAssociatedObject(distSlider, "key",   @"Distance", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(distSlider, "label", distLbl,     OBJC_ASSOCIATION_ASSIGN);
@@ -639,7 +628,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
         spdSlider.maximumValue        = 100.0f;
         spdSlider.value               = speedPct;
         spdSlider.minimumTrackTintColor = kColorAccent;
-        spdSlider.maximumTrackTintColor = [UIColor colorWithWhite:1.0f alpha:0.08f];
+        spdSlider.maximumTrackTintColor = [UIColor colorWithWhite:1.0f alpha:0.05f];
         spdSlider.tag                 = 6006;
         objc_setAssociatedObject(spdSlider, "key",   @"AimSpeed", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(spdSlider, "label", spdLbl,      OBJC_ASSOCIATION_ASSIGN);
@@ -654,7 +643,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
 }
 
 // ─────────────────────────────────────────────
-// MARK: - Switch / Slider handlers  (logic unchanged)
+// MARK: - Switch / Slider handlers
 // ─────────────────────────────────────────────
 
 - (void)switchChanged:(UISwitch *)sender {
@@ -675,7 +664,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
             : kColorSurface;
         rowView.layer.borderColor = value
             ? [UIColor colorWithRed:1.0f green:0.306f blue:0.165f alpha:0.20f].CGColor
-            : [UIColor colorWithWhite:1.0f alpha:0.06f].CGColor;
+            : [UIColor colorWithWhite:1.0f alpha:0.05f].CGColor;
     }
 
     for (UIView *v = self.view.superview; v; v = v.superview) {
@@ -706,7 +695,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
 }
 
 // ─────────────────────────────────────────────
-// MARK: - Segmented Combo  (logic unchanged, styling updated)
+// MARK: - Segmented Combo
 // ─────────────────────────────────────────────
 
 - (NSArray<NSString *> *)comboOptionsForKey:(NSString *)key {
@@ -766,7 +755,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
     track.backgroundColor    = kColorSurface;
     track.layer.cornerRadius = 10.0f;
     track.layer.borderWidth  = 0.5f;
-    track.layer.borderColor  = [UIColor colorWithWhite:1.0f alpha:0.07f].CGColor;
+    track.layer.borderColor  = [UIColor colorWithWhite:1.0f alpha:0.05f].CGColor;
     track.clipsToBounds      = YES;
     [row addSubview:track];
 
@@ -833,7 +822,7 @@ static CAGradientLayer *AccentGradientLayer(CGRect rect) {
 }
 
 // ─────────────────────────────────────────────
-// MARK: - Actions / Touch  (100% logic unchanged)
+// MARK: - Actions / Touch
 // ─────────────────────────────────────────────
 
 - (void)tabButtonTapped:(UIButton *)sender {
